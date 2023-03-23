@@ -23,8 +23,8 @@
 
 		<Menu Grid.Row="0">
 			<MenuItem Header="File">
-				<MenuItem Header="Load" Command="{Binding LoadCommand}" />
-				<MenuItem Header="Save" Command="{Binding SaveCommand}" />
+				<MenuItem Header="Load" Click="MenuItem_Click_1" />
+				<MenuItem Header="Save" Click="MenuItem_Click_2" />
 				<MenuItem Header="Save As" Click="MenuItem_Click" />
 			</MenuItem>
 			<MenuItem Header="View">

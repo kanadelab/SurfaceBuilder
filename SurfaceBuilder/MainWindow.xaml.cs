@@ -18,6 +18,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Windows.Resources;
 using System.Windows.Shapes;
 using System.Xml.XPath;
 
@@ -28,6 +29,8 @@ namespace SurfaceBuilder
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		public string loadFilePath;
+
 		internal new MainViewModel DataContext
 		{
 			get => (MainViewModel)base.DataContext;
@@ -51,10 +54,40 @@ namespace SurfaceBuilder
 			}
 		}
 
+		private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+		{
+			var dialog = new OpenFileDialog();
+			dialog.Filter = "surface project|*.surfaceproj";
+			dialog.InitialDirectory = Environment.CurrentDirectory;
+			if(dialog.ShowDialog() == true)
+			{
+				LoadFile(dialog.FileName);
+			}
+		}
+
+		private void MenuItem_Click_2(object sender, RoutedEventArgs e)
+		{
+			if(string.IsNullOrEmpty(loadFilePath))
+			{
+				MenuItem_Click(sender, e);
+				return;
+			}
+
+			JsonUtility.SerializeToFile(loadFilePath, DataContext.Serialize());
+		}
+
 		public void LoadFile(string fullPath)
 		{
-			var data = JsonUtility.DeserializeFromFile<JObject>(fullPath);
-			DataContext = new MainViewModel(this, data);
+			try
+			{
+				var data = JsonUtility.DeserializeFromFile<JObject>(fullPath);
+				DataContext = new MainViewModel(this, data);
+				loadFilePath = fullPath;
+			}
+			catch
+			{
+			}
+
 		}
 	}
 
@@ -248,11 +281,20 @@ namespace SurfaceBuilder
 
 		public MainViewModel(MainWindow mainWindow, JObject data) : this(mainWindow)
 		{
-			var itemsArray = data[nameof(Items)]?.ToObject<JArray>();
+			var itemsArray = data[nameof(Items)]?.ToObject<JArray>() ?? new JArray();
 			foreach (JObject jobj in itemsArray)
 			{
 				items.Add(new CategoryViewModel(this, jobj));
 			}
+
+			gridViewMaxOffsetX = data[nameof(GridViewMaxOffsetX)]?.Value<int>() ?? gridViewMaxOffsetX;
+			gridViewMaxOffsetY = data[nameof(GridViewMaxOffsetY)]?.Value<int>() ?? gridViewMaxOffsetY;
+			gridViewMaxWidth = data[nameof(GridViewMaxWidth)]?.Value<int>() ?? gridViewMaxWidth;
+			gridViewMaxHeight = data[nameof(GridViewMaxHeight)]?.Value<int>() ?? gridViewMaxHeight;
+			gridViewCurrentOffsetX = data[nameof(GridViewCurrentOffsetX)]?.Value<int>() ?? gridViewCurrentOffsetX;
+			gridViewCurrentOffsetY = data[nameof(GridViewCurrentOffsetY)]?.Value<int>() ?? gridViewCurrentOffsetY;
+			gridViewCurrentWidth = data[nameof(GridViewCurrentWidth)]?.Value<int>() ?? gridViewCurrentWidth;
+			gridViewCurrentHeight = data[nameof(GridViewCurrentHeight)]?.Value<int>() ?? gridViewCurrentHeight;
 		}
 
 		public JObject Serialize()
@@ -556,14 +598,14 @@ namespace SurfaceBuilder
 
 		public CategoryViewModel(MainViewModel main, JObject data):this(main)
 		{
-			var itemsArray = data[nameof(Items)]?.ToObject<JArray>();
+			var itemsArray = data[nameof(Items)]?.ToObject<JArray>() ?? new JArray();
 			foreach(JObject jobj in itemsArray)
 			{
 				items.Add(new ElementViewModel(this, jobj));
 			}
 
-			OffsetString = data[nameof(OffsetString)]?.ToString();
-			var selectedItemIndex = data[nameof(SelectedItem)].Value<int>();
+			OffsetString = data[nameof(OffsetString)]?.ToString() ?? string.Empty;
+			var selectedItemIndex = data[nameof(SelectedItem)]?.Value<int>() ?? 0;
 
 			if (selectedItemIndex >= 0)
 			{
@@ -870,9 +912,9 @@ namespace SurfaceBuilder
 			isShowGrid = true;
 
 			//復元
-			FullPath = data[nameof(FullPath)].ToString();
-			Label = data[nameof(Label)].ToString();
-			OffsetString = data[nameof(OffsetString)].ToString();
+			FullPath = data[nameof(FullPath)].ToString();	//required
+			Label = data[nameof(Label)].ToString() ?? string.Empty;
+			OffsetString = data[nameof(OffsetString)]?.ToString() ?? string.Empty;
 		}
 
 		//シリアライズ
