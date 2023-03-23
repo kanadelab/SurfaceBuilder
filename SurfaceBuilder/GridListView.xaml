@@ -1,0 +1,133 @@
+﻿<Window x:Class="SurfaceBuilder.GridListView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SurfaceBuilder"
+        mc:Ignorable="d"
+        Title="GridListView" Height="450" Width="800">
+	<Window.Resources>
+		<local:IntToRectConverter x:Key="IntToRectConverter" />
+		<local:ReverseOffsetConverter x:Key="ReverseOffsetConverter" />
+	</Window.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<StackPanel>
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="auto" />
+					<RowDefinition Height="auto" />
+					<RowDefinition Height="auto" />
+					<RowDefinition Height="auto" />
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="auto" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="auto" />
+					<ColumnDefinition Width="auto" />
+				</Grid.ColumnDefinitions>
+
+				<TextBlock Grid.Row="0" Grid.Column="0" Text="view offsetX: "/>
+				<Slider Grid.Row="0" Grid.Column="1" Value="{Binding GridViewCurrentOffsetX, Mode=TwoWay}" Minimum="0" Maximum="{Binding GridViewMaxOffsetX}" />
+				<TextBlock Grid.Row="0" Grid.Column="2" Text="max: " />
+				<TextBox Grid.Row="0" Grid.Column="3" Width="100" Text="{Binding GridViewMaxOffsetXString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+				<TextBlock Grid.Row="1" Grid.Column="0" Text="view offsetY: "/>
+				<Slider Grid.Row="1" Grid.Column="1" Value="{Binding GridViewCurrentOffsetY, Mode=TwoWay}" Minimum="0" Maximum="{Binding GridViewMaxOffsetY}" />
+				<TextBlock Grid.Row="1" Grid.Column="2" Text="max: " />
+				<TextBox Grid.Row="1" Grid.Column="3" Width="100" Text="{Binding GridViewMaxOffsetYString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+				<TextBlock Grid.Row="2" Grid.Column="0" Text="view width: "/>
+				<Slider Grid.Row="2" Grid.Column="1" Value="{Binding GridViewCurrentWidth, Mode=TwoWay}" Minimum="0" Maximum="{Binding GridViewMaxWidth}" />
+				<TextBlock Grid.Row="2" Grid.Column="2" Text="max: " />
+				<TextBox Grid.Row="2" Grid.Column="3" Width="100" Text="{Binding GridViewMaxWidthString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+				<TextBlock Grid.Row="3" Grid.Column="0" Text="view height: "/>
+				<Slider Grid.Row="3" Grid.Column="1" Value="{Binding GridViewCurrentHeight, Mode=TwoWay}" Minimum="0" Maximum="{Binding GridViewMaxHeight}" />
+				<TextBlock Grid.Row="3" Grid.Column="2" Text="max: " />
+				<TextBox Grid.Row="3" Grid.Column="3" Width="100" Text="{Binding GridViewMaxHeightString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+			</Grid>
+
+
+		</StackPanel>
+		<ListView x:Name="MainList" Grid.Row="1" ItemsSource="{Binding GridItems}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" >
+			<ListView.ItemsPanel>
+				<ItemsPanelTemplate>
+					<WrapPanel />
+				</ItemsPanelTemplate>
+			</ListView.ItemsPanel>
+
+			<ListView.ItemContainerStyle>
+				<Style TargetType="ListViewItem">
+					<Setter Property="HorizontalAlignment" Value="Left" />
+					<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+				</Style>
+			</ListView.ItemContainerStyle>
+
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<Border BorderThickness="1" BorderBrush="Gray">
+						<ItemsControl ItemsSource="{Binding Items}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<Canvas 
+										Width="{Binding DataContext.GridViewCurrentWidth, RelativeSource={RelativeSource AncestorType=ListView}}" 
+										Height="{Binding DataContext.GridViewCurrentHeight, RelativeSource={RelativeSource AncestorType=ListView}}">
+										<Canvas.RenderTransform>
+											<TranslateTransform 
+												X="{Binding DataContext.GridViewCurrentOffsetX, RelativeSource={RelativeSource AncestorType=ListView}, Converter={StaticResource ReverseOffsetConverter}}" 
+												Y="{Binding DataContext.GridViewCurrentOffsetY, RelativeSource={RelativeSource AncestorType=ListView}, Converter={StaticResource ReverseOffsetConverter}}" 
+												/>
+										</Canvas.RenderTransform>
+									</Canvas>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Image Source="{Binding FullPath}" SnapsToDevicePixels="True"
+										Width="{Binding Source.PixelWidth, RelativeSource={RelativeSource Self}}"
+										Height="{Binding Source.PixelHeight, RelativeSource={RelativeSource Self}}"
+										   >
+										<Image.Clip>
+											<MultiBinding Converter="{StaticResource IntToRectConverter}">
+												<Binding Path="DataContext.GridViewCurrentOffsetX" RelativeSource="{RelativeSource AncestorType=ListView}" />
+												<Binding Path="DataContext.GridViewCurrentOffsetY" RelativeSource="{RelativeSource AncestorType=ListView}" />
+												<Binding Path="DataContext.GridViewCurrentWidth" RelativeSource="{RelativeSource AncestorType=ListView}" />
+												<Binding Path="DataContext.GridViewCurrentHeight" RelativeSource="{RelativeSource AncestorType=ListView}" />
+												<Binding Path="Source.PixelWidth" RelativeSource="{RelativeSource Self}" />
+												<Binding Path="Source.PixelHeight" RelativeSource="{RelativeSource Self}" />
+											</MultiBinding>
+										</Image.Clip>
+										<!--
+										<Image.Source>
+											<CroppedBitmap Source="{Binding FullPath}">
+												
+												<CroppedBitmap.SourceRect>
+													
+												</CroppedBitmap.SourceRect>
+												
+											</CroppedBitmap>
+										</Image.Source>
+										-->
+									</Image>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+							<ItemsControl.ItemContainerStyle>
+								<Style TargetType="FrameworkElement">
+									<Setter Property="Canvas.Left" Value="{Binding OffsetX}" />
+									<Setter Property="Canvas.Top" Value="{Binding OffsetY}" />
+								</Style>
+							</ItemsControl.ItemContainerStyle>
+						</ItemsControl>
+					</Border>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+
+	</Grid>
+</Window>
