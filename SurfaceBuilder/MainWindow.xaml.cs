@@ -303,6 +303,14 @@ namespace SurfaceBuilder
 			var itemsArray = new JArray(items.Select(o => o.Serialize()).ToArray());
 
 			result[nameof(Items)] = itemsArray;
+			result[nameof(GridViewMaxOffsetX)] = gridViewMaxOffsetX;
+			result[nameof(GridViewMaxOffsetY)] = gridViewMaxOffsetY;
+			result[nameof(GridViewMaxWidth)] = gridViewMaxWidth;
+			result[nameof(GridViewMaxHeight)] = gridViewMaxHeight;
+			result[nameof(GridViewCurrentOffsetX)] = gridViewCurrentOffsetX;
+			result[nameof(GridViewCurrentOffsetY)] = gridViewCurrentOffsetY;
+			result[nameof(GridViewCurrentWidth)] = gridViewCurrentWidth;
+			result[nameof(GridViewCurrentHeight)] = gridViewCurrentHeight;
 
 			return result;
 		}
@@ -449,9 +457,13 @@ namespace SurfaceBuilder
 
 					if (!isSkip)
 					{
-						Application.Current.Dispatcher.Invoke(() =>
-							gridItems.Add(new GridListItemViewModel(images)), System.Windows.Threading.DispatcherPriority.ContextIdle
-						);
+						try
+						{
+							Application.Current.Dispatcher.Invoke(() =>
+								gridItems.Add(new GridListItemViewModel(images)), System.Windows.Threading.DispatcherPriority.ContextIdle, makeGridCanceller.Token
+							);
+						}
+						catch { }
 					}
 
 					//インクリメント(差分作成上、末尾から)

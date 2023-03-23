@@ -88,7 +88,7 @@
 														</CheckBox>
 														<local:WartermarkedTextBox Grid.Column="1" Wartermark="Label" Text="{Binding Label,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 														<local:WartermarkedTextBox Grid.Column="2" Wartermark="offsetX,offsetY" Text="{Binding OffsetString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-														<ToggleButton Grid.Column="3" Content="□" IsChecked="{Binding IsShowGrid}" />
+														<ToggleButton Grid.Column="3" Content="□" IsChecked="{Binding IsShowGrid}" ToolTip="Show Gridview" />
 														<Button Grid.Column="4" Content="↑" Command="{Binding MoveUpCommand}" />
 														<Button Grid.Column="5" Content="↓" Command="{Binding MoveDownCommand}" />
 														<Button Grid.Column="6" Content="✕" Command="{Binding RemoveCommand}"/>
