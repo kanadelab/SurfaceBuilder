@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SurfaceBuilder"
 		xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1200" AllowDrop="True">
+        Title="立ち絵を重ねるやつ" Height="600" Width="1200" AllowDrop="True">
 	<i:Interaction.Triggers>
 		<i:EventTrigger EventName="DragEnter">
 			<i:InvokeCommandAction Command="{Binding DragEnterCommand}" PassEventArgsToCommand="True"/>
@@ -92,29 +92,10 @@
 														<Button Grid.Column="4" Content="↑" Command="{Binding MoveUpCommand}" />
 														<Button Grid.Column="5" Content="↓" Command="{Binding MoveDownCommand}" />
 														<Button Grid.Column="6" Content="✕" Command="{Binding RemoveCommand}"/>
-														<!--
-													<TextBlock Grid.Column="0" Text="{Binding FileName}" />
-													-->
-														<!--
-													<Image Grid.Column="1" Source="{Binding FullPath}" Height="100">
-														<Image.ToolTip>
-															<Image Source="{Binding FullPath}" SnapsToDevicePixels="True"
-																   Width="{Binding Source.PixelWidth, RelativeSource={RelativeSource Self}}"
-																   Height="{Binding Source.PixelHeight, RelativeSource={RelativeSource Self}}"/>
-														</Image.ToolTip>
-													</Image>
-													-->
-														
+
 													</Grid>
 												</DataTemplate>
 											</ItemsControl.ItemTemplate>
-											<!--
-											<ItemsControl.ItemContainerStyle>
-												<Style TargetType="FrameworkElement">
-													<Setter Property="HorizontalContentAlignment" Value="Stretch" />
-												</Style>
-											</ItemsControl.ItemContainerStyle>
-											-->
 											<ItemsControl.ItemsPanel>
 												<ItemsPanelTemplate>
 													<StackPanel />
@@ -126,6 +107,21 @@
 							</GroupBox>
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
+					<ItemsControl.Style>
+						<Style TargetType="ItemsControl">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding Items.Count}" Value="0">
+									<Setter Property="Template">
+										<Setter.Value>
+											<ControlTemplate>
+												<TextBlock Text="画像ファイルをドロップすると表示できます" HorizontalAlignment="Center" VerticalAlignment="Center" />
+											</ControlTemplate>
+										</Setter.Value>
+									</Setter>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</ItemsControl.Style>
 				</ItemsControl>
 			</ScrollViewer>
 
@@ -164,12 +160,13 @@
 				<!--
 				<Rectangle Fill="Red" Grid.Row="1" IsHitTestVisible="False" />
 				-->
-				
+
+				<GridSplitter Grid.Row="1" />
 
 				<TextBox Grid.Row="2" AcceptsReturn="True" IsReadOnly="True" Text="{Binding SurfacesString,Mode=OneWay}" ScrollViewer.VerticalScrollBarVisibility="Visible">
 
 				</TextBox>
-				<GridSplitter Grid.Row="1" ResizeDirection="Rows" VerticalAlignment="Stretch" IsEnabled="True" />
+				
 			</Grid>
 		</Grid>
 	</Grid>

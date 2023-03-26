@@ -424,9 +424,15 @@ namespace SurfaceBuilder
 			{
 				makeGridCanceller.Cancel();
 				makeGridTask.Wait();
+				makeGridTask = null;
+				makeGridCanceller = null;
 			}
 
 			gridItems.Clear();
+
+			if (!items.Any())
+				return;
+
 			makeGridCanceller = new CancellationTokenSource();
 
 			//順番変更は問題なので先に配列をフリーズ
